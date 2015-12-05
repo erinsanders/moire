@@ -1,1 +1,125 @@
-test
+<!DOCTYPE>
+<html>
+
+	<canvas id = 'c'></canvas>
+
+</html>
+
+<script>
+var s = 70; //step
+var c = document.getElementById("c");
+var ctx = c.getContext("2d");
+var cw = c.width = 9 * s,
+  cx = cw / 2;
+var ch = c.height = 9 * s,
+  cy = ch / 2;
+var rad = (Math.PI / 180);
+var flag = false;
+
+var p = [];
+
+//ctx.strokeStyle = "white";
+ctx.fillStyle = "black";
+ctx.lineWidth = 2;
+var y = 0;
+var i = 0; //increment
+var speed = .5;
+var a = 90; //initial angle
+var h = 110;//hue
+var stopped = true;
+
+// build pints array
+for (var x = -3; x <= 3; x++) {
+
+  if (i == 0) {
+    flag = true;
+  } else if (i == 2) {
+    flag = false
+  }
+  if (flag) {
+    i++;
+  } else {
+    i--
+  }
+
+  var pl = p.length;
+  p[pl] = {}
+  p[pl].x = x * s
+  p[pl].y = y - 10 + i * s;
+}
+
+function drawCurve(y) {
+  if(h < 250){h+=speed;}else{h = 110;}
+  ctx.save();
+  ctx.translate(0, -4 * s + y);
+  ctx.strokeStyle ="hsl("+h+",100%,70%)";
+  ctx.beginPath();
+  ctx.moveTo(p[0].x, p[0].y)
+  for (var i = 1; i < p.length - 1; i += 2) {
+    ctx.quadraticCurveTo(p[i].x, p[i].y, p[i + 1].x, p[i + 1].y);
+  }
+
+  ctx.stroke();
+  ctx.restore();
+}
+
+function Draw() {
+  h=110;//reset hue
+  if(a < 360){a+=speed;}else{a = 0;}
+
+  ctx.save();
+  ctx.fillRect(-cw, -ch, 2 * cw, 2 * ch);
+  ctx.translate(cx, cy);
+  for (var y = 0; y <= 6 * s; y += 5) {
+    drawCurve(y);
+  }
+  ctx.globalCompositeOperation = "difference";
+  ctx.rotate(a * rad);
+  for (var y = 0; y <= 6 * s; y += 5) {
+    drawCurve(y);
+  }
+  ctx.restore();
+  requestId = window.requestAnimationFrame(Draw);
+
+}
+
+function start() {
+
+  requestId = window.requestAnimationFrame(Draw);
+  stopped = false;
+
+}
+window.addEventListener("load", start(), false);
+
+function stopAnim() {
+  if (requestId) {
+    window.cancelAnimationFrame(requestId);
+  }
+  stopped = true;
+}
+
+c.addEventListener("click", function() {
+  (stopped == true) ? start(): stopAnim();
+}, false)
+</script>
+
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: black;
+}
+
+
+
+canvas {
+  margin: 0;
+  display:block;
+  margin:30px auto;
+  margin: calc(50vh - 315px) auto;
+  background: transparent;
+  border:1px solid #333;
+}
+</style>
+
